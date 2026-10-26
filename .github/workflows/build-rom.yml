@@ -7,6 +7,13 @@ on:
       - '.github/workflows/build-rom.yml'
   workflow_dispatch:
 
+env:
+  GAME_REVISION: 0
+  GAME_LANGUAGE: ENGLISH
+  COMPARE: 0
+  UNUSED_ERROR: 1
+  DEPRECATED_ERROR: 1
+
 jobs:
   build:
     name: Build pokeemerald-expansion
@@ -15,24 +22,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install devkitARM
+      - name: Install toolchain
         run: |
-          set -euxo pipefail
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends ca-certificates curl
-          curl -fSL https://apt.devkitpro.org/install-devkitpro-pacman -o install-devkitpro-pacman
-          chmod +x install-devkitpro-pacman
-          echo | sudo -E ./install-devkitpro-pacman
-          sudo dkp-pacman -S --noconfirm gba-dev
+          sudo apt-get install -y --no-install-recommends binutils-arm-none-eabi gcc-arm-none-eabi libnewlib-arm-none-eabi libpng-dev python3
 
       - name: Build
         env:
-          DEVKITPRO: /opt/devkitpro
-          DEVKITARM: /opt/devkitpro/devkitARM
-        run: |
-          set -euxo pipefail
-          arm-none-eabi-gcc --version
-          make -j"$(nproc)"
+          GAME_VERSION: EMERALD
+        run: make -j$(nproc) -O
 
       - name: Upload ROM
         uses: actions/upload-artifact@v4
