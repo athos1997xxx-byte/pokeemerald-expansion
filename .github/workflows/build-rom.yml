@@ -36,5 +36,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: pokeemerald-expansion
-          path: pokeemerald-expansion.gba
+          path: pokeemerald.gba
           if-no-files-found: error
