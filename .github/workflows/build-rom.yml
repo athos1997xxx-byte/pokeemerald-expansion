@@ -1,0 +1,42 @@
+name: Build GBA ROM
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/build-rom.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build pokeemerald-expansion
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install devkitARM
+        run: |
+          set -euxo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends ca-certificates curl
+          curl -fSL https://apt.devkitpro.org/install-devkitpro-pacman -o install-devkitpro-pacman
+          chmod +x install-devkitpro-pacman
+          echo | sudo -E ./install-devkitpro-pacman
+          sudo dkp-pacman -S --noconfirm gba-dev
+
+      - name: Build
+        env:
+          DEVKITPRO: /opt/devkitpro
+          DEVKITARM: /opt/devkitpro/devkitARM
+        run: |
+          set -euxo pipefail
+          arm-none-eabi-gcc --version
+          make -j"$(nproc)"
+
+      - name: Upload ROM
+        uses: actions/upload-artifact@v4
+        with:
+          name: pokeemerald-expansion
+          path: pokeemerald-expansion.gba
+          if-no-files-found: error
