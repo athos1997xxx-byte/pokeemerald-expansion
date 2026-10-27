@@ -38,3 +38,5 @@ jobs:
           name: pokeemerald-expansion
           path: pokeemerald.gba
           if-no-files-found: error
+
+# rebuild trigger
